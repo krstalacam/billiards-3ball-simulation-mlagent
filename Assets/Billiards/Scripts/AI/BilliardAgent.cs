@@ -29,6 +29,7 @@ public class BilliardAgent : Agent
     private BilliardObservationCollector _observationCollector;
     private BilliardActionMapper _actionMapper;
     private BilliardRewardManager _rewardManager;
+    private BilliardEpisodeManager _episodeManager;
 
     // Control state
     private bool _heuristicMode;
@@ -76,6 +77,7 @@ public class BilliardAgent : Agent
             _config.angleYLimits,
             _config.powerLimits
         );
+        _episodeManager = new BilliardEpisodeManager(_environment);
         
         _rewardManager = GetComponent<BilliardRewardManager>();
         if (_rewardManager == null)
@@ -178,6 +180,7 @@ public class BilliardAgent : Agent
     private void OnBallsStopped()
     {
         _rewardManager?.OnTurnEnded();
+        _episodeManager?.RegisterTurnCompletion(_config, this);
 
         // Eğer sıra ajanda ve karar isteği toplar durana ertelendiyse, şimdi iste
         if (_pendingTurnDecision && _flowManager != null && _flowManager.isActiveAndEnabled)
@@ -211,6 +214,7 @@ public class BilliardAgent : Agent
         // Sadece ilk başta veya manuel reset gerektiğinde reset yapılır
         
         Debug.Log("[BilliardAgent] Episode Begin - NOT resetting environment (turn-based learning)");
+        _episodeManager?.BeginEpisode();
         
         // Cancel any pending decision requests from the previous episode.
         CancelInvoke(nameof(RequestDecisionDelayed));

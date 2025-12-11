@@ -243,12 +243,19 @@ public class BilliardRewardManager : MonoBehaviour
             AddReward(penalty);
             Debug.Log($"[Reward] ⚠️ NO CONTACT (Boş Vuruş)! Penalty: {penalty} | Total Reward: {GetTotalReward()}");
         }
-        // 4. Başarısız atış (temas var ama sayı yok)
+        // 4. Sadece duvara değdi (Topa değmedi)
+        else if (_lastWallCount > 0 && _lastBallCount == 0)
+        {
+            float penalty = _config.wallOnlyPenalty;
+            AddReward(penalty);
+            Debug.Log($"[Reward] 🧱 WALL ONLY (No Balls)! Penalty: {penalty} | Total Reward: {GetTotalReward()}");
+        }
+        // 5. Başarısız atış (Temas var ama sayı yok - Genelde buraya düşmez çünkü üstteki wall check yakalar, ama topa değip sayı olmadıysa burası çalışır)
         else
         {
             float penalty = _config.unsuccessfulShotPenalty;
             AddReward(penalty);
-            Debug.Log($"[Reward] ⚠️ UNSUCCESSFUL SHOT (Walls: {_lastWallCount}, Balls: {_lastBallCount}) | Penalty: {penalty} | Total Reward: {GetTotalReward()}");
+            Debug.Log($"[Reward] ⚠️ UNSUCCESSFUL SHOT (Hits: {_lastWallCount} Wall, {_lastBallCount} Ball) | Penalty: {penalty} | Total Reward: {GetTotalReward()}");
         }
 
         // Her tur sonunda köşe kontrolü yap

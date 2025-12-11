@@ -63,6 +63,9 @@ public class BilliardAgentConfig : ScriptableObject
     [Tooltip("Hiçbir şeye değmeme cezası (Boş vuruş) - Orta şiddette ceza")]
     public float noContactPenalty = -1.0f;  // -1.5 -> -1.0 (Biraz daha affedici olabilir)
 
+    [Tooltip("Sadece duvara değme cezası (Topa değmedi) - Boş vuruşa yakın olmalı ki topa değmeye çalışsın")]
+    public float wallOnlyPenalty = -0.8f;
+
     [Tooltip("Engellenmiş atış cezası (Fiziksel olarak imkansız açı seçimi) - Orta ceza")]
     public float blockedShotPenalty = -2f;  // -5 → -2 (imkansız açıları öğrenmeli ama çok ağır olmasın)
 
@@ -85,6 +88,9 @@ public class BilliardAgentConfig : ScriptableObject
 
     [Tooltip("Training mode'da watchdog timeout süresi (saniye) - Ajana öğrenme zamanı vermek için uzun tutulmalı")]
     public float trainingModeWatchdogTimeout = 10f;
+
+    [Tooltip("Bir episode'un sürebileceği maksimum tur sayısı (Sıkışmayı önlemek için)")]
+    public int maxTurnsPerEpisode = 50;
 
     [Header("Heuristic Mode Settings")]
     [Tooltip("Heuristic modda test controller'ı otomatik aç/kapat?")]

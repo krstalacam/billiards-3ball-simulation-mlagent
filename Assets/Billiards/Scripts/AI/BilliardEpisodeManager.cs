@@ -12,6 +12,7 @@ public class BilliardEpisodeManager
     private readonly BilliardGameManager _gameManager;
     private bool _shotInFlight;
     private float _decisionTimer;
+    private int _currentTurnCount = 0; // Tur sayacı
 
     // Events
     public event System.Action OnShotCompleted;
@@ -47,6 +48,7 @@ public class BilliardEpisodeManager
     {
         _shotInFlight = false;
         _decisionTimer = 0f;
+        _currentTurnCount = 0; // Reset counter
         
         if (_environment != null)
         {
@@ -162,6 +164,22 @@ public class BilliardEpisodeManager
     }
 
     // OnBallsStoppedSwitchTurn is removed as GameFlowManager now handles this.
+
+    /// <summary>
+    /// Checks if the episode should be forced to end due to turn limit.
+    /// Should be called after a turn is completed.
+    /// </summary>
+    public void RegisterTurnCompletion(BilliardAgentConfig config, BilliardAgent agent)
+    {
+        _currentTurnCount++;
+        
+        if (config != null && agent != null && _currentTurnCount >= config.maxTurnsPerEpisode)
+        {
+             Debug.Log($"[BilliardEpisodeManager] Max turns reached ({_currentTurnCount}/{config.maxTurnsPerEpisode}). Forcing episode end.");
+             agent.EndEpisode(); 
+             // Note: EndEpisode will trigger OnEpisodeBegin which calls BeginEpisode, resetting the counter.
+        }
+    }
 
     /// <summary>
     /// Environment referansını değiştirir (gerekirse).
