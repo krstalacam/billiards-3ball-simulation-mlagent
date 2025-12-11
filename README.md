@@ -17,7 +17,18 @@ The AI learns to:
 *   **Maximize the score** by pocketing balls or achieving specific collision sequences (Carom).  
 *   **Avoid getting stuck** in corners using a dedicated corner-avoidance system.
 
+
 All configuration parameters (angle limits, power limits, reward values, penalty thresholds) are exposed via `BilliardAgentConfig.cs` for rapid tweaking directly from the Unity Inspector.
+
+---
+
+## 📸 Screenshots
+
+![Gameplay 5](img/Ekran%20görüntüsü%202025-12-11%20220536.png)
+![Gameplay 4](img/Ekran%20görüntüsü%202025-12-10%20210505.png)
+![Gameplay 3](img/Ekran%20görüntüsü%202025-12-10%20210455.png)
+![Gameplay 2](img/Ekran%20görüntüsü%202025-12-10%20145751.png)
+![Gameplay 1](img/Ekran%20görüntüsü%202025-12-07%20192213.png)
 
 ---
 
