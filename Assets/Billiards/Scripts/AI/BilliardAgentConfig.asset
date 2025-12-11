@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4e5f6789012345678901234abcddddd, type: 3}
+  m_Name: BilliardAgentConfig
+  m_EditorClassIdentifier: Assembly-CSharp::BilliardAgentConfig
+  angleXLimits: {x: -180, y: 180}
+  angleYLimits: {x: 0, y: 45}
+  powerLimits: {x: 6, y: 10}
+  tableExtents: {x: 2.25, y: 4.45}
+  tableCenterOffset: {x: -1.19, y: -0.18, z: 0}
+  autoRequestDecisions: 1
+  decisionInterval: 0.05
+  decisionReward: 0
+  shotExecutionReward: 0
+  wallHitReward: 0
+  firstBallHitReward: 1
+  secondBallHitReward: 2
+  successfulScoreReward: 5
+  powerPenaltyMultiplier: 0
+  outOfBoundsPenalty: -3
+  unsuccessfulShotPenalty: -0.5
+  noContactPenalty: -1
+  blockedShotPenalty: -2
+  enableCornerPenalty: 1
+  cornerStayPenalty: -1
+  maxConsecutiveCornerTurns: 3
+  cornerThreshold: 0.88
+  playModeWatchdogTimeout: 5
+  trainingModeWatchdogTimeout: 5
+  toggleTestControllerForHeuristic: 1

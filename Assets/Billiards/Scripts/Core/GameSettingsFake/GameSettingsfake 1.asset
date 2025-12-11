@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77bed1f0926602f48bcb6f363fef4161, type: 3}
+  m_Name: GameSettingsfake 1
+  m_EditorClassIdentifier: Assembly-CSharp::GameSettings
+  _gameMode: 3
+  _ballMode: 1
+  _isTrainingMode: 0
+  _availableModels:
+  - {fileID: 5022602860645237092, guid: b66a6a22195fb2f408c68113c1c0064e, type: 3}
+  - {fileID: 5022602860645237092, guid: bffc5c8ace21f34459fef9d5d42a7465, type: 3}
+  - {fileID: 5022602860645237092, guid: 3b3b35f41730a0d45abdd9a3df1a2136, type: 3}
+  - {fileID: 5022602860645237092, guid: 09b2fc3d224c2564a9536a0415f372a0, type: 3}
+  - {fileID: 5022602860645237092, guid: 2e1171cc33045dc40b66c36a5767a0e8, type: 3}
+  _currentModelIndex: 1
