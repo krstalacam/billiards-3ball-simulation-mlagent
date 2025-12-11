@@ -133,12 +133,6 @@ config/
 
 ---
 
-## 📚 Documentation & Resources  
-
-*   **Unity ML-Agents Toolkit**: [GitHub](https://github.com/Unity-Technologies/ml-agents)
-*   **Three-Ball Billiards Rules**: [Wikipedia](https://en.wikipedia.org/wiki/Three-ball_(billiards))
-
----
 
 ## 📄 License  
 
