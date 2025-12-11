@@ -43,28 +43,28 @@ public class BilliardAgentConfig : ScriptableObject
     public float wallHitReward = 0.00f;  // 0.02 -> 0.00 (Farming engellendi. Sadece sayı için araç olmalı.)
 
     [Tooltip("İlk topa temas ödülü - Herhangi bir topa vurması önemli bir ilerleme")]
-    public float firstBallHitReward = 1.0f;  // 0.3 → 1.0 (3x artırıldı: NET POZİTİF olması şart)
+    public float firstBallHitReward = 3.0f;  // 1.0 → 3.0 (Cezalardan çok daha yüksek olmalı)
 
     [Tooltip("İkinci topa temas ödülü - İki topa birden vurması çok iyi bir gelişme")]
-    public float secondBallHitReward = 2.0f;  // 0.5 → 2.0 (4x artırıldı: iki top çarpışması çok değerli)
+    public float secondBallHitReward = 10.0f;  // 2.0 → 10.0 (Büyük hedef)
 
     [Tooltip("Başarılı sayı ödülü (3 bant + 2 top) - EN BÜYÜK HEDEF")]
-    public float successfulScoreReward = 5.0f;  // 3.0 → 5.0 (büyük başarı = büyük ödül)
+    public float successfulScoreReward = 25.0f;  // 5.0 → 25.0 (Jackpot)
 
     [Tooltip("Atış gücüne bağlı ceza çarpanı. Yüksek güçleri cezalandırmak için kullanılır.")]
     public float powerPenaltyMultiplier = 0f; // bunu kullanmıcaz. 0 kalsın.
 
     [Tooltip("Faul cezası (Top dışarı çıkması gibi ciddi hatalar) - Ağır ceza gerekli")]
-    public float outOfBoundsPenalty = -3f;  // -5 → -3 (biraz hafiflettik ama hala caydırıcı)
+    public float outOfBoundsPenalty = -1.0f;  // -3 → -1.0 (Daha az korkutucu)
 
     [Tooltip("Başarısız atış cezası (Temas var ama sayı olmadı) - HAFİF CEZA, öğrenmeye izin ver")]
-    public float unsuccessfulShotPenalty = -0.5f;  // -5 → -0.5 (10x azaldı: deneme yapmayı teşvik et)
+    public float unsuccessfulShotPenalty = -0.1f;  // -0.5 → -0.1 (Denemek neredeyse bedava)
 
     [Tooltip("Hiçbir şeye değmeme cezası (Boş vuruş) - Orta şiddette ceza")]
-    public float noContactPenalty = -1.0f;  // -1.5 -> -1.0 (Biraz daha affedici olabilir)
+    public float noContactPenalty = -0.5f;  // -1.0 -> -0.5 (Cezalar azaltıldı)
 
     [Tooltip("Sadece duvara değme cezası (Topa değmedi) - Boş vuruşa yakın olmalı ki topa değmeye çalışsın")]
-    public float wallOnlyPenalty = -0.8f;
+    public float wallOnlyPenalty = -0.3f; // -0.8 -> -0.3 (Cezalar azaltıldı)
 
     [Tooltip("Engellenmiş atış cezası (Fiziksel olarak imkansız açı seçimi) - Orta ceza")]
     public float blockedShotPenalty = -2f;  // -5 → -2 (imkansız açıları öğrenmeli ama çok ağır olmasın)
