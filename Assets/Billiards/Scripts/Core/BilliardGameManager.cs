@@ -40,6 +40,10 @@ public class BilliardGameManager : MonoBehaviour
     public CueStick PrimaryCueStick => _primaryCueStick;
     public CueStick SecondaryCueStick => _secondaryCueStick;
     
+    public BilliardBall MainBall => _mainBall;
+    public BilliardBall TargetBall => _targetBall;
+    public BilliardBall SecondaryBall => _secondaryBall;
+    
     [Header("Game Settings")]
     [SerializeField] private float _stopVelocityThreshold = 0.2f; // Tüm toplar durdu kabul edilmeden önceki bekleme süresi
     [SerializeField] private float _maxWaitTime = 15f; // Topların durması için maksimum bekleme süresi (8 -> 15)

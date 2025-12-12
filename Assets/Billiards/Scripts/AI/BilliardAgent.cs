@@ -214,7 +214,7 @@ public class BilliardAgent : Agent
         // Sadece ilk başta veya manuel reset gerektiğinde reset yapılır
         
         Debug.Log("[BilliardAgent] Episode Begin - NOT resetting environment (turn-based learning)");
-        _episodeManager?.BeginEpisode();
+        _episodeManager?.BeginEpisode(_config);
         
         // Cancel any pending decision requests from the previous episode.
         CancelInvoke(nameof(RequestDecisionDelayed));

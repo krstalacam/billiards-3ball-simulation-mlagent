@@ -129,6 +129,7 @@ public class BilliardBall : MonoBehaviour
         TeleportTo(_initialPosition, _initialRotation, true);
     }
 
+
     private void TeleportTo(Vector3 position, Quaternion rotation, bool syncPhysics)
     {
         if (_rigidbody != null)

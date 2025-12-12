@@ -90,7 +90,20 @@ public class BilliardAgentConfig : ScriptableObject
     public float trainingModeWatchdogTimeout = 10f;
 
     [Tooltip("Bir episode'un sürebileceği maksimum tur sayısı (Sıkışmayı önlemek için)")]
-    public int maxTurnsPerEpisode = 50;
+    public int maxTurnsPerEpisode = 20;
+
+    [Header("Ball Randomization")]
+    [Tooltip("Episode başlangıcında topların pozisyonlarını rastgele yerleştir (Training için önerilir)")]
+    public bool randomizeBallPositions = true;
+
+    [Tooltip("Topların rastgele yerleştirilebileceği alan X ekseni (masa merkezi etrafında)")]
+    public Vector2 randomizationAreaX = new Vector2(-1.5f, 1.5f);
+
+    [Tooltip("Topların rastgele yerleştirilebileceği alan Z ekseni (masa merkezi etrafında)")]
+    public Vector2 randomizationAreaZ = new Vector2(-3.0f, 3.0f);
+
+    [Tooltip("Toplar arası minimum mesafe (çakışmayı önlemek için)")]
+    public float minDistanceBetweenBalls = 0.3f;
 
     [Header("Heuristic Mode Settings")]
     [Tooltip("Heuristic modda test controller'ı otomatik aç/kapat?")]

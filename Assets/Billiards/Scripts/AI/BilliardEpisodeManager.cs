@@ -44,7 +44,7 @@ public class BilliardEpisodeManager
     /// <summary>
     /// Episode başlangıcında çağrılır. Environment'ı resetler.
     /// </summary>
-    public void BeginEpisode()
+    public void BeginEpisode(BilliardAgentConfig config = null)
     {
         _shotInFlight = false;
         _decisionTimer = 0f;
@@ -54,10 +54,98 @@ public class BilliardEpisodeManager
         {
             _environment.RequestEnvironmentReset();
             
+            // Topları rastgele konumlandır (eğer aktifse)
+            if (config != null && config.randomizeBallPositions && _gameManager != null)
+            {
+                RandomizeBallPositions(config);
+            }
+            
             // GameFlowManager now handles the initial turn state based on GameMode.
             // So, we don't need to set it here anymore.
         }
     }
+
+    /// <summary>
+    /// Topları rastgele konumlara yerleştirir (çakışmayı önleyerek)
+    /// </summary>
+    private void RandomizeBallPositions(BilliardAgentConfig config)
+    {
+        if (_gameManager == null) return;
+
+        var mainBall = _gameManager.MainBall;
+        var targetBall = _gameManager.TargetBall;
+        var secondaryBall = _gameManager.SecondaryBall;
+
+        if (mainBall == null || targetBall == null || secondaryBall == null)
+        {
+            Debug.LogWarning("[BilliardEpisodeManager] Cannot randomize - one or more balls are null!");
+            return;
+        }
+
+        // Y pozisyonu sabit (masa yüzeyi)
+        float yPosition = mainBall.transform.position.y;
+        
+        // Topları rastgele yerleştir (çakışmayı önle)
+        System.Collections.Generic.List<Vector3> positions = new System.Collections.Generic.List<Vector3>();
+        
+        // Main Ball
+        Vector3 mainPos = GetRandomPosition(config, yPosition, positions);
+        positions.Add(mainPos);
+        mainBall.SetInitialPosition(mainPos);
+        
+        // Target Ball
+        Vector3 targetPos = GetRandomPosition(config, yPosition, positions);
+        positions.Add(targetPos);
+        targetBall.SetInitialPosition(targetPos);
+        
+        // Secondary Ball
+        Vector3 secondaryPos = GetRandomPosition(config, yPosition, positions);
+        positions.Add(secondaryPos);
+        secondaryBall.SetInitialPosition(secondaryPos);
+
+        Debug.Log($"[BilliardEpisodeManager] Balls randomized - Main: {mainPos}, Target: {targetPos}, Secondary: {secondaryPos}");
+
+
+    /// <summary>
+    /// Diğer toplarla çakışmayan rastgele bir pozisyon üretir
+    /// </summary>
+    private Vector3 GetRandomPosition(BilliardAgentConfig config, float yPosition, System.Collections.Generic.List<Vector3> existingPositions)
+    {
+        int maxAttempts = 50;
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            float randomX = UnityEngine.Random.Range(config.randomizationAreaX.x, config.randomizationAreaX.y);
+            float randomZ = UnityEngine.Random.Range(config.randomizationAreaZ.x, config.randomizationAreaZ.y);
+            Vector3 candidatePos = new Vector3(randomX, yPosition, randomZ);
+            
+            // Diğer toplarla çakışma kontrolü
+            bool tooClose = false;
+            foreach (var existingPos in existingPositions)
+            {
+                float distance = Vector3.Distance(new Vector3(candidatePos.x, 0, candidatePos.z), 
+                                                  new Vector3(existingPos.x, 0, existingPos.z));
+                if (distance < config.minDistanceBetweenBalls)
+                {
+                    tooClose = true;
+                    break;
+                }
+            }
+            
+            if (!tooClose)
+            {
+                return candidatePos;
+            }
+        }
+        
+        // Eğer uygun pozisyon bulunamazsa, rastgele bir pozisyon döndür (son çare)
+        Debug.LogWarning("[BilliardEpisodeManager] Could not find non-overlapping position after max attempts!");
+        return new Vector3(
+            UnityEngine.Random.Range(config.randomizationAreaX.x, config.randomizationAreaX.y),
+            yPosition,
+            UnityEngine.Random.Range(config.randomizationAreaZ.x, config.randomizationAreaZ.y)
+        );
+    }
+
 
     /// <summary>
     /// Environment'a event handler bağlar.
