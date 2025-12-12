@@ -10,9 +10,11 @@ public class BilliardEpisodeManager
 {
     private readonly BilliardAIEnvironment _environment;
     private readonly BilliardGameManager _gameManager;
+    private GameSettings _gameSettings; // GameSettings referansı
     private bool _shotInFlight;
     private float _decisionTimer;
     private int _currentTurnCount = 0; // Tur sayacı
+    private bool _shouldRandomizeBallsNextEpisode = false; // Bir sonraki episode'da topları rastgele yerleştir mi?
 
     // Events
     public event System.Action OnShotCompleted;
@@ -29,7 +31,8 @@ public class BilliardEpisodeManager
         }
         
         _environment = environment;
-        _gameManager = environment.GetComponent<BilliardGameManager>();
+        // BilliardAIEnvironment holds a serialized reference to the GameManager (may live on a different object)
+        _gameManager = environment.GameManager;
 
         if (_gameManager == null)
         {
@@ -39,30 +42,115 @@ public class BilliardEpisodeManager
 
         _shotInFlight = false;
         _decisionTimer = 0f;
+        _shouldRandomizeBallsNextEpisode = true; // İlk episode'da topları rastgele yerleştir
+        
+        // GameSettings'i bul
+        if (_gameSettings == null)
+        {
+            var settingsAssets = Resources.FindObjectsOfTypeAll<GameSettings>();
+            if (settingsAssets.Length > 0)
+            {
+                _gameSettings = settingsAssets[0];
+                Debug.Log("[BilliardEpisodeManager] GameSettings found and assigned.");
+            }
+            else
+            {
+                Debug.LogWarning("[BilliardEpisodeManager] GameSettings not found! Ball randomization will use config only.");
+            }
+        }
     }
 
     /// <summary>
     /// Episode başlangıcında çağrılır. Environment'ı resetler.
     /// </summary>
-    public void BeginEpisode(BilliardAgentConfig config = null)
+    /// <param name="config">Agent konfigürasyonu</param>
+    /// <param name="shouldRandomizeBalls">Topları rastgele yerleştir mi? (Varsayılan: false, sadece max turn'de true olmalı)</param>
+    public void BeginEpisode(BilliardAgentConfig config = null, bool shouldRandomizeBalls = false)
     {
         _shotInFlight = false;
         _decisionTimer = 0f;
-        _currentTurnCount = 0; // Reset counter
+        
+        // Flag'i kontrol et (eğer parametre verilmediyse)
+        if (!shouldRandomizeBalls)
+        {
+            shouldRandomizeBalls = _shouldRandomizeBallsNextEpisode;
+            _shouldRandomizeBallsNextEpisode = false; // Flag'i sıfırla
+        }
+        // NOT: _currentTurnCount burada sıfırlanmıyor! Sadece max turn'e ulaşıldığında sıfırlanacak.
         
         if (_environment != null)
         {
-            _environment.RequestEnvironmentReset();
+            // GameSettings'ten randomization ayarını kontrol et
+            bool shouldRandomizeFromSettings = _gameSettings != null && _gameSettings.RandomizeBallPositions;
             
-            // Topları rastgele konumlandır (eğer aktifse)
-            if (config != null && config.randomizeBallPositions && _gameManager != null)
+            // Topları rastgele konumlandır (SADECE shouldRandomizeBalls true ise VE GameSettings izin veriyorsa)
+            if (shouldRandomizeBalls && shouldRandomizeFromSettings && config != null && config.randomizeBallPositions && _gameManager != null)
             {
+                // SADECE topları rastgele yerleştireceğimiz zaman environment'ı resetle
+                _environment.RequestEnvironmentReset();
                 RandomizeBallPositions(config);
+                Debug.Log($"[BilliardEpisodeManager] Environment reset and balls randomized (Turn: {_currentTurnCount}, GameSettings.RandomizeBallPositions={shouldRandomizeFromSettings}).");
+            }
+            else
+            {
+                // Topları rastgele yerleştirmiyorsak, sadece hızlarını sıfırla (pozisyonları koru)
+                StopAllBallsWithoutReset();
+                
+                string reason = !shouldRandomizeBalls ? "shouldRandomizeBalls=false" : 
+                               !shouldRandomizeFromSettings ? "GameSettings.RandomizeBallPositions=false" :
+                               config == null ? "config=null" :
+                               !config.randomizeBallPositions ? "config.randomizeBallPositions=false" :
+                               "_gameManager=null";
+                Debug.Log($"[BilliardEpisodeManager] Balls NOT randomized - keeping current positions (Turn: {_currentTurnCount}, Reason: {reason}).");
             }
             
             // GameFlowManager now handles the initial turn state based on GameMode.
             // So, we don't need to set it here anymore.
         }
+    }
+
+    /// <summary>
+    /// Topların hızını sıfırlar ama pozisyonlarını değiştirmez
+    /// </summary>
+    private void StopAllBallsWithoutReset()
+    {
+        if (_gameManager == null) return;
+
+        var mainBall = _gameManager.MainBall;
+        var targetBall = _gameManager.TargetBall;
+        var secondaryBall = _gameManager.SecondaryBall;
+
+        if (mainBall != null)
+        {
+            var rb = mainBall.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
+
+        if (targetBall != null)
+        {
+            var rb = targetBall.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
+
+        if (secondaryBall != null)
+        {
+            var rb = secondaryBall.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
+
+        Debug.Log("[BilliardEpisodeManager] All balls stopped (velocities zeroed, positions preserved).");
     }
 
     /// <summary>
@@ -107,22 +195,39 @@ public class BilliardEpisodeManager
     }
 
     /// <summary>
-    /// Diğer toplarla çakışmayan rastgele bir pozisyon üretir
+    /// Diğer toplarla çakışmayan rastgele bir pozisyon üretir (tableCenterOffset kullanarak)
     /// </summary>
     private Vector3 GetRandomPosition(BilliardAgentConfig config, float yPosition, System.Collections.Generic.List<Vector3> existingPositions)
     {
+        // Environment transform'unu al (köşe kontrolü ile aynı sistem)
+        Transform tableTransform = _environment?.transform;
+        if (tableTransform == null)
+        {
+            Debug.LogWarning("[BilliardEpisodeManager] Environment transform not found! Using world space origin.");
+            tableTransform = _gameManager?.transform; // Fallback
+        }
+
         int maxAttempts = 50;
         for (int i = 0; i < maxAttempts; i++)
         {
-            float randomX = UnityEngine.Random.Range(config.randomizationAreaX.x, config.randomizationAreaX.y);
-            float randomZ = UnityEngine.Random.Range(config.randomizationAreaZ.x, config.randomizationAreaZ.y);
-            Vector3 candidatePos = new Vector3(randomX, yPosition, randomZ);
+            // Local space'de rastgele pozisyon üret (tableCenterOffset ile)
+            float localX = UnityEngine.Random.Range(config.randomizationAreaX.x, config.randomizationAreaX.y);
+            float localZ = UnityEngine.Random.Range(config.randomizationAreaZ.x, config.randomizationAreaZ.y);
+            Vector3 localPos = new Vector3(localX, 0, localZ) + config.tableCenterOffset;
+            
+            // Local'den world space'e çevir
+            Vector3 worldPos = tableTransform != null 
+                ? tableTransform.TransformPoint(localPos) 
+                : localPos;
+            
+            // Y pozisyonunu ayarla
+            worldPos.y = yPosition;
             
             // Diğer toplarla çakışma kontrolü
             bool tooClose = false;
             foreach (var existingPos in existingPositions)
             {
-                float distance = Vector3.Distance(new Vector3(candidatePos.x, 0, candidatePos.z), 
+                float distance = Vector3.Distance(new Vector3(worldPos.x, 0, worldPos.z), 
                                                   new Vector3(existingPos.x, 0, existingPos.z));
                 if (distance < config.minDistanceBetweenBalls)
                 {
@@ -133,17 +238,18 @@ public class BilliardEpisodeManager
             
             if (!tooClose)
             {
-                return candidatePos;
+                return worldPos;
             }
         }
         
         // Eğer uygun pozisyon bulunamazsa, rastgele bir pozisyon döndür (son çare)
         Debug.LogWarning("[BilliardEpisodeManager] Could not find non-overlapping position after max attempts!");
-        return new Vector3(
-            UnityEngine.Random.Range(config.randomizationAreaX.x, config.randomizationAreaX.y),
-            yPosition,
-            UnityEngine.Random.Range(config.randomizationAreaZ.x, config.randomizationAreaZ.y)
-        );
+        float fallbackLocalX = UnityEngine.Random.Range(config.randomizationAreaX.x, config.randomizationAreaX.y);
+        float fallbackLocalZ = UnityEngine.Random.Range(config.randomizationAreaZ.x, config.randomizationAreaZ.y);
+        Vector3 fallbackLocal = new Vector3(fallbackLocalX, 0, fallbackLocalZ) + config.tableCenterOffset;
+        Vector3 fallbackWorld = tableTransform != null ? tableTransform.TransformPoint(fallbackLocal) : fallbackLocal;
+        fallbackWorld.y = yPosition;
+        return fallbackWorld;
     }
 
 
@@ -263,9 +369,21 @@ public class BilliardEpisodeManager
         
         if (config != null && agent != null && _currentTurnCount >= config.maxTurnsPerEpisode)
         {
-             Debug.Log($"[BilliardEpisodeManager] Max turns reached ({_currentTurnCount}/{config.maxTurnsPerEpisode}). Forcing episode end.");
-             agent.EndEpisode(); 
-             // Note: EndEpisode will trigger OnEpisodeBegin which calls BeginEpisode, resetting the counter.
+             Debug.Log($"[BilliardEpisodeManager] Max turns reached ({_currentTurnCount}/{config.maxTurnsPerEpisode}). Resetting turn counter and randomizing balls.");
+             
+             // Turn sayacını sıfırla
+             _currentTurnCount = 0;
+             
+             // Bir sonraki episode'da topları rastgele yerleştir
+             _shouldRandomizeBallsNextEpisode = true;
+             
+             // Episode'u bitir ve yeni episode başlat (topları rastgele yerleştirerek)
+             agent.EndEpisode();
+             // NOT: EndEpisode çağrısı OnEpisodeBegin'i tetikleyecek, orada BeginEpisode(config, shouldRandomizeBalls: true) çağrılmalı
+        }
+        else
+        {
+            Debug.Log($"[BilliardEpisodeManager] Turn {_currentTurnCount}/{config.maxTurnsPerEpisode} completed. Continuing with current ball positions.");
         }
     }
 

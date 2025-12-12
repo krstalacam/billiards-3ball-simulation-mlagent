@@ -37,5 +37,9 @@ MonoBehaviour:
   cornerThreshold: 0.88
   playModeWatchdogTimeout: 5
   trainingModeWatchdogTimeout: 5
-  maxTurnsPerEpisode: 25
+  maxTurnsPerEpisode: 10
+  randomizeBallPositions: 1
+  randomizationAreaX: {x: -2.05, y: 1.74}
+  randomizationAreaZ: {x: -3.83, y: 3.77}
+  minDistanceBetweenBalls: 0.3
   toggleTestControllerForHeuristic: 1

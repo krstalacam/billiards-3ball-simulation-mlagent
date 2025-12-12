@@ -26,6 +26,7 @@ public class BilliardGameMenuUI : MonoBehaviour
     [SerializeField] private Dropdown _ballModeDropdown;
     [SerializeField] private Dropdown _modelDropdown;
     [SerializeField] private Toggle _trainingModeToggle;
+    [SerializeField] private Toggle _randomizeBallPositionsToggle;
     [SerializeField] private Toggle _showAimInGameToggle;
     [SerializeField] private CueStick _cueStick;
     [SerializeField] private Button _restartButton;
@@ -164,6 +165,17 @@ public class BilliardGameMenuUI : MonoBehaviour
             _showAimInGameToggle.SetIsOnWithoutNotify(initial);
             _showAimInGameToggle.onValueChanged.AddListener(OnShowAimInGameToggleChanged);
         }
+
+        // Initialize randomize ball positions toggle
+        if (_randomizeBallPositionsToggle != null)
+        {
+            bool initialRandomize = _gameSettings != null && _gameSettings.RandomizeBallPositions;
+            _randomizeBallPositionsToggle.SetIsOnWithoutNotify(initialRandomize);
+            _randomizeBallPositionsToggle.onValueChanged.AddListener(OnRandomizeBallPositionsToggleChanged);
+            
+            // Training modda toggle'ı devre dışı bırak (otomatik aktif)
+            UpdateRandomizeBallPositionsToggleState();
+        }
     }
 
     private void Update()
@@ -244,6 +256,12 @@ public class BilliardGameMenuUI : MonoBehaviour
         if (_modelDropdown != null)
         {
             _modelDropdown.SetValueWithoutNotify(_gameSettings.CurrentModelIndex);
+        }
+
+        if (_randomizeBallPositionsToggle != null)
+        {
+            _randomizeBallPositionsToggle.SetIsOnWithoutNotify(_gameSettings.RandomizeBallPositions);
+            UpdateRandomizeBallPositionsToggleState();
         }
     }
 
@@ -327,6 +345,9 @@ public class BilliardGameMenuUI : MonoBehaviour
     {
         if (_gameSettings == null) return;
         _gameSettings.SetTrainingMode(isOn);
+        
+        // Training mode değiştiğinde randomize toggle durumunu güncelle
+        UpdateRandomizeBallPositionsToggleState();
     }
 
     private void InitializeModelDropdown()
@@ -352,6 +373,36 @@ public class BilliardGameMenuUI : MonoBehaviour
         if (_cueStick != null)
         {
             _cueStick.SetShowAimInGame(isOn);
+        }
+    }
+
+    private void OnRandomizeBallPositionsToggleChanged(bool isOn)
+    {
+        if (_gameSettings != null)
+        {
+            _gameSettings.SetRandomizeBallPositions(isOn);
+        }
+    }
+
+    /// <summary>
+    /// Training modda toggle'ı devre dışı bırak (otomatik aktif)
+    /// </summary>
+    private void UpdateRandomizeBallPositionsToggleState()
+    {
+        if (_randomizeBallPositionsToggle == null || _gameSettings == null) return;
+        
+        bool isTraining = _gameSettings.IsTrainingMode;
+        
+        // Training modda toggle devre dışı ve işaretli
+        _randomizeBallPositionsToggle.interactable = !isTraining;
+        
+        if (isTraining)
+        {
+            _randomizeBallPositionsToggle.SetIsOnWithoutNotify(true);
+        }
+        else
+        {
+            _randomizeBallPositionsToggle.SetIsOnWithoutNotify(_gameSettings.RandomizeBallPositions);
         }
     }
 

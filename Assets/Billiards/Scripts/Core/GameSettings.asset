@@ -15,6 +15,7 @@ MonoBehaviour:
   _gameMode: 3
   _ballMode: 1
   _isTrainingMode: 1
+  _randomizeBallPositions: 1
   _availableModels:
   - {fileID: 5022602860645237092, guid: b66a6a22195fb2f408c68113c1c0064e, type: 3}
   - {fileID: 5022602860645237092, guid: bffc5c8ace21f34459fef9d5d42a7465, type: 3}
@@ -24,4 +25,4 @@ MonoBehaviour:
   - {fileID: 5022602860645237092, guid: 1dd394f1542b5a042a01341ed9e33877, type: 3}
   - {fileID: 5022602860645237092, guid: 76548fece0039d24186d828ab6b8fb18, type: 3}
   - {fileID: 5022602860645237092, guid: efd77ee866e7a414baa287e516306415, type: 3}
-  _currentModelIndex: 7
+  _currentModelIndex: 2

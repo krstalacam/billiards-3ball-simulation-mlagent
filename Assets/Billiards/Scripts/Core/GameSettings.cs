@@ -21,12 +21,21 @@ public class GameSettings : ScriptableObject
     [Tooltip("Enable this for training sessions. The agent's behavior type will be set to Default.")]
     [SerializeField] private bool _isTrainingMode = false;
 
+    [Header("Ball Randomization")]
+    [Tooltip("Rastgele top yerleştirme (Training modda otomatik aktif, diğer modlarda manuel kontrol edilebilir)")]
+    [SerializeField] private bool _randomizeBallPositions = false;
+
     [Header("AI Models")]
     [Tooltip("List of available NN Models for the agent.")]
     [SerializeField] private List<NNModel> _availableModels;
     [SerializeField] private int _currentModelIndex = 0;
 
     public bool IsTrainingMode => _isTrainingMode;
+    
+    /// <summary>
+    /// Training modda otomatik true döner, diğer modlarda kullanıcı ayarını döner
+    /// </summary>
+    public bool RandomizeBallPositions => _isTrainingMode || _randomizeBallPositions;
 
     public BilliardGameManager.GameMode CurrentGameMode => _gameMode;
     public BilliardGameManager.BallMode CurrentBallMode => _ballMode;
@@ -65,6 +74,13 @@ public class GameSettings : ScriptableObject
     {
         if (_currentModelIndex == index) return;
         _currentModelIndex = index;
+        NotifySettingsChanged();
+    }
+
+    public void SetRandomizeBallPositions(bool randomize)
+    {
+        if (_randomizeBallPositions == randomize) return;
+        _randomizeBallPositions = randomize;
         NotifySettingsChanged();
     }
 

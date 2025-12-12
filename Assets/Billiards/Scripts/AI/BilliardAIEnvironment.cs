@@ -22,6 +22,8 @@ public class BilliardAIEnvironment : MonoBehaviour
     [Header("Core References")]
     [SerializeField] private BilliardGameManager _gameManager;
     [SerializeField] private BilliardScoreManager _scoreManager;
+    public BilliardScoreManager ScoreManager => _scoreManager;
+
     [SerializeField] private CueStick _playerCueStick;
     [SerializeField] private CueStick _agentCueStick;
     [SerializeField] private BilliardBall _mainBall;
@@ -62,7 +64,8 @@ public class BilliardAIEnvironment : MonoBehaviour
     public BilliardBall MainBall => _mainBall;
     public BilliardBall TargetBall => _targetBall;
     public BilliardBall SecondaryBall => _secondaryBall;
-    public BilliardScoreManager ScoreManager => _scoreManager;
+    // Expose the serialized game manager so other helper classes can access it
+    public BilliardGameManager GameManager => _gameManager;
     public bool IsShotInProgress => _gameManager != null && _gameManager.AreBallsMoving();
     public TurnState CurrentTurn => _currentTurn;
 
@@ -553,6 +556,57 @@ public class BilliardAIEnvironment : MonoBehaviour
         {
             _cueWatchdogActive = false;
             OnWatchdogCueStuckCancelled?.Invoke();
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        // Rastgele top pozisyonları alanını görselleştir
+        if (_config != null && _config.randomizeBallPositions)
+        {
+            // Dikdörtgen alanın köşelerini hesapla (local space + offset)
+            // Köşe kontrolü ile aynı koordinat sistemini kullan
+            Vector3 localMin = new Vector3(_config.randomizationAreaX.x, 0, _config.randomizationAreaZ.x) + _config.tableCenterOffset;
+            Vector3 localMax = new Vector3(_config.randomizationAreaX.y, 0, _config.randomizationAreaZ.y) + _config.tableCenterOffset;
+            
+            // Dikdörtgenin 4 köşesi (local space)
+            Vector3 corner1Local = new Vector3(localMin.x, 0, localMin.z);
+            Vector3 corner2Local = new Vector3(localMax.x, 0, localMin.z);
+            Vector3 corner3Local = new Vector3(localMax.x, 0, localMax.z);
+            Vector3 corner4Local = new Vector3(localMin.x, 0, localMax.z);
+            
+            // Local'den world space'e çevir (Environment transform kullanarak)
+            Transform tableTransform = this.transform;
+            Vector3 corner1 = tableTransform.TransformPoint(corner1Local);
+            Vector3 corner2 = tableTransform.TransformPoint(corner2Local);
+            Vector3 corner3 = tableTransform.TransformPoint(corner3Local);
+            Vector3 corner4 = tableTransform.TransformPoint(corner4Local);
+            
+            // Y pozisyonunu masa yüzeyine ayarla
+            float yPos = _mainBall != null ? _mainBall.transform.position.y : 0.5f;
+            corner1.y = yPos;
+            corner2.y = yPos;
+            corner3.y = yPos;
+            corner4.y = yPos;
+            
+            // Yeşil renkte dikdörtgen çiz
+            Gizmos.color = new Color(0f, 1f, 0f, 0.7f);
+            Gizmos.DrawLine(corner1, corner2);
+            Gizmos.DrawLine(corner2, corner3);
+            Gizmos.DrawLine(corner3, corner4);
+            Gizmos.DrawLine(corner4, corner1);
+            
+            // Çapraz çizgiler (merkezi göster)
+            Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
+            Gizmos.DrawLine(corner1, corner3);
+            Gizmos.DrawLine(corner2, corner4);
+            
+            // Merkez noktayı göster
+            Vector3 centerLocal = (_config.tableCenterOffset);
+            Vector3 centerWorld = tableTransform.TransformPoint(centerLocal);
+            centerWorld.y = yPos;
+            Gizmos.color = new Color(1f, 1f, 0f, 0.8f);
+            Gizmos.DrawSphere(centerWorld, 0.05f);
         }
     }
 
