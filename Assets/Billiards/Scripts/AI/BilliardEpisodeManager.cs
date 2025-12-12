@@ -104,7 +104,7 @@ public class BilliardEpisodeManager
         secondaryBall.SetInitialPosition(secondaryPos);
 
         Debug.Log($"[BilliardEpisodeManager] Balls randomized - Main: {mainPos}, Target: {targetPos}, Secondary: {secondaryPos}");
-
+    }
 
     /// <summary>
     /// Diğer toplarla çakışmayan rastgele bir pozisyon üretir
