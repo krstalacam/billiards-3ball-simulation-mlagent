@@ -1,0 +1,18 @@
+her birine 2 dk veriyoruz 8x hızdayız. test edelim.  rastgele top konumlarına göre eğitildiler o yüzden bazen kenarlarda hep aynı seyı secebılıyorlar.
+1- skor: 2 , yanlış karalar verebılıyor.  MyBehavior-1099999. 59 kb .
+2- skor: 2 , yanlış karalar verebılıyor. MyBehavior-2049999 . 59 kb . uzun vadede daha iyi skor alıyor. belkı daha fazla egıtım gereklıdır. cunku rastgele top konumlarına göre eğitildiler.
+
+4- skor: 1 , başlangıç konumunda sureklı dışarı atabılıyor topu. iyi değil. cunku az egitlmıs model bunlar. MyBehavior-299999 . 75 kb
+5- skor: 2 , başlangıç konumunda sureklı dışarı atabılıyor topu.  MyBehavior-349999  . 75 kb
+6- skor: 0, çok kötü ve  takılıyor. bazen bir yerde takılıyor aynı hareketi yapıyor hep. MyBehavior-1499999 . 75 kb
+7- skor: 5, yine bazen takılabiliyor ama fena değil. ama bu kadar yuksek skor olması şansa oldu. MyBehavior-1549999 . 75 kb 
+8- skor: 0, bozulmuş yine takılabiliyor kafası karışmış. MyBehavior-1749999 . 75 kb
+9- skor: 0, bozulmuş yine takılabiliyor kafası karışmış.  MyBehavior-2449999 . 75 kb
+10- skor: 1, bozulmuş yine takılabiliyor kafası karışmış. MyBehavior-6649999 . 75 kb
+
+
+
+
+ billiard_agent_v15  3 layer 128 noron - 75 kb bu da fena değil.
+ billiard_agent_v16  4 layer 64 nöron - 59 kb boyut az olsada en iyi bu öğrendi .
+ billiard_agent_v17  4 layer 128 noron - 206 kb ama daha iyi öğrenmedi

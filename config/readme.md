@@ -4,7 +4,7 @@ cd /d "D:\krstlcm Workspace\Unity\UnityProjects\1.Seviye\threeballbilliards\thre
 conda activate mlagents
 
 
-mlagents-learn config\MyBehavior.yaml --run-id=billiard_agent_v13 --resume --env="Build\three-ball-billiards-agent.exe"
+mlagents-learn config\MyBehavior.yaml --run-id=billiard_agent_v16 --resume --env="Build\three-ball-billiards-agent.exe"
 
 
 
